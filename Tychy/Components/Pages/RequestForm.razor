@@ -1,0 +1,67 @@
+﻿@page "/request-form"
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="bg-light">
+                <div class="card-header navbar-dark-tychy text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-envelope-plus"></i> Formularz zamówienia kodu
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="readerId" class="form-label">Numer karty czytelnika *</label>
+                            <input type="text" class="form-control" id="readerId"
+                                   placeholder="Wprowadź numer z karty bibliotecznej" />
+                            <div class="form-text">Numer znajduje się na Twojej karcie bibliotecznej</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Adres email *</label>
+                            <input type="email" class="form-control" id="email"
+                                   placeholder="twoj.email@example.com" />
+                            <div class="form-text">Na ten adres wyślemy kod dostępu</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="platform" class="form-label">Wybierz platformę *</label>
+                            <select class="form-select" id="platform">
+                                <option value="">-- Wybierz platformę ebooków --</option>
+                                <option value="1">Legimi (150 dostępnych kodów)</option>
+                                <option value="2">Empik GO (200 dostępnych kodów)</option>
+                                <option value="3" disabled>Nexto (brak kodów)</option>
+                            </select>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle"></i> Informacje:</h6>
+                            <ul class="mb-0">
+                                <li>Kody wydajemy od 1-go dnia każdego miesiąca</li>
+                                <li>Jeden czytelnik może otrzymać jeden kod miesięcznie</li>
+                                <li>Kody są ważne przez 30 dni</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send"></i> Wyślij zgłoszenie
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void HandleSubmit()
+    {
+        Console.WriteLine("Form submitted");
+    }
+}
