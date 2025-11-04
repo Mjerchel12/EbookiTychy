@@ -20,7 +20,6 @@ namespace Tychy.Components
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string EmailTemplate { get; set; }
         public string Instructions { get; set; }
         public bool IsActive { get; set; } = true;
         public ICollection<EbookCode>? Codes { get; set; }
@@ -36,7 +35,6 @@ namespace Tychy.Components
     {
         public int Id { get; set; }
         public string Code { get; set; }
-        public int EbookPlatformId { get; set; }
         public EbookPlatform Platform { get; set; }
         public CodeStatus Status { get; set; } = CodeStatus.Available;
         public DateTime? ReservedAt { get; set; }
@@ -44,8 +42,6 @@ namespace Tychy.Components
         public DateTime? UsedDate { get; set; }
         public DateTime? Deadline { get; set; }
         public Reader Reader { get; set; }
-        public string ReservedForReaderId { get; set; }
-        public string SentToEmail { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? LastModifiedBy { get; set; }
         public DateTime? LastModifiedAt { get; set; }
@@ -57,12 +53,9 @@ namespace Tychy.Components
     {
         public int Id { get; set; }
         public Reader Reader { get; set; }
-        public string ReaderId { get; set; }
-        public int EbookPlatformId { get; set; }
         public EbookPlatform Platform { get; set; }
-        public DateTime RequestDate { get; set; } = DateTime.UtcNow;
+        public DateTime RequestDate { get; set; } = DateTime.Now;
         public RequestStatus Status { get; set; } = RequestStatus.Pending;
-        public int AssignedCodeId { get; set; }
         public EbookCode AssignedCode { get; set; }
         public string Email { get; set; }
         public string ValidationMessage { get; set; }
@@ -74,7 +67,6 @@ namespace Tychy.Components
     public class Reader
     {
         public int Id { get; set; }
-        public string ReaderId { get; set; }
         public string? Email { get; set; }
         public string? FullName { get; set; }
         public bool IsBlocked { get; set; }

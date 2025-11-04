@@ -1,10 +1,17 @@
+using Microsoft.EntityFrameworkCore;
 using Tychy.Components;
+using Tychy.Components.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyAppDb;Trusted_Connection=True;"));
+
+builder.Services.AddScoped<RequestService> ();
 
 var app = builder.Build();
 

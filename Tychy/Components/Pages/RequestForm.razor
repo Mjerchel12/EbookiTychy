@@ -1,5 +1,8 @@
 ﻿@page "/request-form"
+@using Tychy.Components.Services
+@inject RequestService requestService
 
+<h1>@dziala</h1>
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -45,7 +48,7 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="button" class="btn btn-primary btn-lg" @onclick="HandleSubmit">
                                 <i class="bi bi-send"></i> Wyślij zgłoszenie
                             </button>
                             <button type="reset" class="btn btn-outline-secondary">
@@ -60,8 +63,23 @@
 </div>
 
 @code {
-    private void HandleSubmit()
+    private string dziala = "Jeszcze nie działa";
+    private async Task HandleSubmit()
     {
+        dziala = "Działa";
         Console.WriteLine("Form submitted");
+        try
+        {
+            var reader = new Reader { Email = "test@mail.com" };
+            var platform = new EbookPlatform { Name = "Test" };
+
+            await requestService.MakeRequest(reader, platform);
+
+            Console.WriteLine("Zgłoszenie wysłane!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd: {ex.Message}");
+        }
     }
 }
