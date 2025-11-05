@@ -12,7 +12,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyAppDb;Trusted_Connection=True;"));
 
 builder.Services.AddScoped<RequestService>();
-builder.Services.AddHostedService<MonthlyCheckService>();
+builder.Services.AddScoped<PlatformService>();
+//builder.Services.AddHostedService<MonthlyCheckService>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();

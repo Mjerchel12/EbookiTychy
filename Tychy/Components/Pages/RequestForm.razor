@@ -3,7 +3,6 @@
 @using Tychy.Components.Services
 @inject RequestService requestService
 
-<h1>@dziala</h1>
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -64,10 +63,8 @@
 </div>
 
 @code {
-    private string dziala = "Jeszcze nie działa";
     private async Task HandleSubmit()
     {
-        dziala = "Działa";
         Console.WriteLine("Form submitted");
         try
         {
