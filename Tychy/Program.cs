@@ -11,7 +11,12 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyAppDb;Trusted_Connection=True;"));
 
-builder.Services.AddScoped<RequestService> ();
+builder.Services.AddScoped<RequestService>();
+builder.Services.AddHostedService<MonthlyCheckService>();
+
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 var app = builder.Build();
 

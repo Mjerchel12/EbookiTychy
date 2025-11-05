@@ -36,6 +36,46 @@ namespace Tychy.Components
                 .HasOne(r => r.Reader)
                 .WithMany(rd => rd.Requests)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<EbookPlatform>()
+                .Property(p => p.Instructions)
+                .IsRequired(false);
+
+            modelBuilder.Entity<EbookPlatform>()
+                .Property(p => p.Name)
+                .IsRequired(false);
+
+            modelBuilder.Entity<EbookCode>()
+                .Property(p => p.Code)
+                .IsRequired(false);
+
+            modelBuilder.Entity<EbookCode>()
+                .Property(p => p.LastModifiedBy)
+                .IsRequired(false);
+
+            modelBuilder.Entity<CodeRequest>()
+                .Property(p => p.Email)
+                .IsRequired(false);
+
+            modelBuilder.Entity<CodeRequest>()
+                .Property(p => p.ValidationMessage)
+                .IsRequired(false);
+
+            modelBuilder.Entity<CodeRequest>()
+                .Property(p => p.RejectionReason)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Reader>()
+                .Property(p => p.Email)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Reader>()
+                .Property(p => p.FullName)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Reader>()
+                .Property(p => p.BlockReason)
+                .IsRequired(false);
         }
 
     }

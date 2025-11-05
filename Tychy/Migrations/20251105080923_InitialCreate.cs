@@ -17,8 +17,8 @@ namespace Tychy.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Instructions = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Instructions = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     MonthlyLimit = table.Column<int>(type: "int", nullable: false)
                 },
@@ -36,7 +36,7 @@ namespace Tychy.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsBlocked = table.Column<bool>(type: "bit", nullable: false),
-                    BlockReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BlockReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BlockDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     BlockedUntil = table.Column<DateTime>(type: "datetime2", nullable: false),
                     HasUnusedCodeLastMonth = table.Column<bool>(type: "bit", nullable: false),
@@ -54,17 +54,17 @@ namespace Tychy.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PlatformId = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PlatformId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ReservedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     SentAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UsedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Deadline = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ReaderId = table.Column<int>(type: "int", nullable: false),
+                    ReaderId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -79,8 +79,7 @@ namespace Tychy.Migrations
                         name: "FK_Codes_Readers_ReaderId",
                         column: x => x.ReaderId,
                         principalTable: "Readers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -89,14 +88,14 @@ namespace Tychy.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ReaderId = table.Column<int>(type: "int", nullable: false),
-                    PlatformId = table.Column<int>(type: "int", nullable: false),
+                    ReaderId = table.Column<int>(type: "int", nullable: true),
+                    PlatformId = table.Column<int>(type: "int", nullable: true),
                     RequestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    AssignedCodeId = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ValidationMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AssignedCodeId = table.Column<int>(type: "int", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ValidationMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDuplicate = table.Column<bool>(type: "bit", nullable: false),
                     IsBannedThisMonth = table.Column<bool>(type: "bit", nullable: false)
                 },

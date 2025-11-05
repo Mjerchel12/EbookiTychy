@@ -12,7 +12,7 @@ using Tychy.Components;
 namespace Tychy.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251104092836_InitialCreate")]
+    [Migration("20251105080923_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -33,11 +33,10 @@ namespace Tychy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AssignedCodeId")
+                    b.Property<int?>("AssignedCodeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsBannedThisMonth")
@@ -46,14 +45,13 @@ namespace Tychy.Migrations
                     b.Property<bool>("IsDuplicate")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PlatformId")
+                    b.Property<int?>("PlatformId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReaderId")
+                    b.Property<int?>("ReaderId")
                         .HasColumnType("int");
 
                     b.Property<string>("RejectionReason")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("RequestDate")
@@ -63,7 +61,6 @@ namespace Tychy.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ValidationMessage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -86,7 +83,6 @@ namespace Tychy.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -95,16 +91,16 @@ namespace Tychy.Migrations
                     b.Property<DateTime?>("Deadline")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("LastModifiedAt")
+                    b.Property<DateTime>("LastModifiedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PlatformId")
+                    b.Property<int?>("PlatformId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReaderId")
+                    b.Property<int?>("ReaderId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ReservedAt")
@@ -137,7 +133,6 @@ namespace Tychy.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Instructions")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -147,7 +142,6 @@ namespace Tychy.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -167,7 +161,6 @@ namespace Tychy.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("BlockReason")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("BlockedUntil")
@@ -201,20 +194,17 @@ namespace Tychy.Migrations
                     b.HasOne("Tychy.Components.EbookCode", "AssignedCode")
                         .WithMany()
                         .HasForeignKey("AssignedCodeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Tychy.Components.EbookPlatform", "Platform")
                         .WithMany()
                         .HasForeignKey("PlatformId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Tychy.Components.Reader", "Reader")
                         .WithMany("Requests")
                         .HasForeignKey("ReaderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AssignedCode");
 
@@ -228,14 +218,11 @@ namespace Tychy.Migrations
                     b.HasOne("Tychy.Components.EbookPlatform", "Platform")
                         .WithMany("Codes")
                         .HasForeignKey("PlatformId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Tychy.Components.Reader", "Reader")
                         .WithMany()
-                        .HasForeignKey("ReaderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReaderId");
 
                     b.Navigation("Platform");
 
