@@ -12,7 +12,7 @@ using Tychy.Components;
 namespace Tychy.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251105080923_InitialCreate")]
+    [Migration("20251106110537_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -69,7 +69,9 @@ namespace Tychy.Migrations
 
                     b.HasIndex("PlatformId");
 
-                    b.HasIndex("ReaderId");
+                    b.HasIndex("ReaderId")
+                        .IsUnique()
+                        .HasFilter("[ReaderId] IS NOT NULL");
 
                     b.ToTable("Requests");
                 });
@@ -90,6 +92,9 @@ namespace Tychy.Migrations
 
                     b.Property<DateTime?>("Deadline")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("LastModifiedAt")
                         .HasColumnType("datetime2");
@@ -184,6 +189,9 @@ namespace Tychy.Migrations
                     b.Property<DateTime?>("LastActivity")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte?>("ReaderNumber")
+                        .HasColumnType("tinyint");
+
                     b.HasKey("Id");
 
                     b.ToTable("Readers");
@@ -202,8 +210,8 @@ namespace Tychy.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Tychy.Components.Reader", "Reader")
-                        .WithMany("Requests")
-                        .HasForeignKey("ReaderId")
+                        .WithOne("Request")
+                        .HasForeignKey("Tychy.Components.CodeRequest", "ReaderId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AssignedCode");
@@ -236,7 +244,7 @@ namespace Tychy.Migrations
 
             modelBuilder.Entity("Tychy.Components.Reader", b =>
                 {
-                    b.Navigation("Requests");
+                    b.Navigation("Request");
                 });
 #pragma warning restore 612, 618
         }

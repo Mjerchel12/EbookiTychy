@@ -13,7 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<RequestService>();
 builder.Services.AddScoped<PlatformService>();
-//builder.Services.AddHostedService<MonthlyCheckService>();
+builder.Services.AddHostedService<MonthlyCheckService>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();

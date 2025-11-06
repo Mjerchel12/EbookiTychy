@@ -52,6 +52,7 @@ namespace Tychy.Components
     public class CodeRequest
     {
         public int Id { get; set; }
+        public int? ReaderId { get; set; }
         public Reader? Reader { get; set; }
         public EbookPlatform? Platform { get; set; }
         public DateTime RequestDate { get; set; } = DateTime.Now;
@@ -67,6 +68,7 @@ namespace Tychy.Components
     public class Reader
     {
         public int Id { get; set; }
+        public byte? ReaderNumber { get; set; }
         public string? Email { get; set; } = string.Empty;
         public string? FullName { get; set; } = string.Empty;
         public bool IsBlocked { get; set; }
@@ -74,8 +76,7 @@ namespace Tychy.Components
         public DateTime BlockDate { get; set; }
         public DateTime BlockedUntil { get; set; }
         public bool HasUnusedCodeLastMonth { get; set; }
-
-        public List<CodeRequest> Requests { get; set; } = new List<CodeRequest>();
+        public CodeRequest? Request { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastActivity { get; set; }
     }

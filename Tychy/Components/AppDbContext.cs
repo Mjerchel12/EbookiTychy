@@ -34,7 +34,7 @@ namespace Tychy.Components
 
             modelBuilder.Entity<CodeRequest>()
                 .HasOne(r => r.Reader)
-                .WithMany(rd => rd.Requests)
+                .WithOne(rd => rd.Request)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<EbookPlatform>()
@@ -76,6 +76,11 @@ namespace Tychy.Components
             modelBuilder.Entity<Reader>()
                 .Property(p => p.BlockReason)
                 .IsRequired(false);
+
+            modelBuilder.Entity<Reader>()
+                .HasOne(r => r.Request)
+                .WithOne(req => req.Reader)
+                .HasForeignKey<CodeRequest>(req => req.ReaderId);
         }
 
     }

@@ -2,7 +2,7 @@
 {
     public class RequestService
     {
-        private readonly AppDbContext _context;
+        internal readonly AppDbContext _context;
 
         public RequestService(AppDbContext context) {
             _context = context;

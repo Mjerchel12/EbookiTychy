@@ -33,6 +33,7 @@ namespace Tychy.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ReaderNumber = table.Column<byte>(type: "tinyint", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsBlocked = table.Column<bool>(type: "bit", nullable: false),
@@ -64,7 +65,8 @@ namespace Tychy.Migrations
                     ReaderId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsValid = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -145,7 +147,9 @@ namespace Tychy.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Requests_ReaderId",
                 table: "Requests",
-                column: "ReaderId");
+                column: "ReaderId",
+                unique: true,
+                filter: "[ReaderId] IS NOT NULL");
         }
 
         /// <inheritdoc />

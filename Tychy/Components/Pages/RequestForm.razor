@@ -1,6 +1,7 @@
 ﻿@page "/request-form"
 @rendermode InteractiveServer
 @using Tychy.Components.Services
+@using System.Linq
 @inject RequestService requestService
 
 <div class="container mt-4">
@@ -17,14 +18,16 @@
                         <div class="mb-3">
                             <label for="readerId" class="form-label">Numer karty czytelnika *</label>
                             <input type="text" class="form-control" id="readerId"
-                                   placeholder="Wprowadź numer z karty bibliotecznej" />
+                                   placeholder="Wprowadź numer z karty bibliotecznej" 
+                                   @bind="readerNumb"/>
                             <div class="form-text">Numer znajduje się na Twojej karcie bibliotecznej</div>
                         </div>
 
                         <div class="mb-3">
                             <label for="email" class="form-label">Adres email *</label>
                             <input type="email" class="form-control" id="email"
-                                   placeholder="twoj.email@example.com" />
+                                   placeholder="twoj.email@example.com" 
+                                   @bind="readerMail"/>
                             <div class="form-text">Na ten adres wyślemy kod dostępu</div>
                         </div>
 
@@ -32,9 +35,9 @@
                             <label for="platform" class="form-label">Wybierz platformę *</label>
                             <select class="form-select" id="platform">
                                 <option value="">-- Wybierz platformę ebooków --</option>
-                                <option value="1">Legimi (150 dostępnych kodów)</option>
-                                <option value="2">Empik GO (200 dostępnych kodów)</option>
-                                <option value="3" disabled>Nexto (brak kodów)</option>
+                                <option value="Legimi">Legimi (150 dostępnych kodów)</option>
+                                <option value="Empik GO">Empik GO (200 dostępnych kodów)</option>
+                                <option value="Nexto" disabled>Nexto (brak kodów)</option>
                             </select>
                         </div>
 
@@ -63,21 +66,32 @@
 </div>
 
 @code {
+    private byte readerNumb = 0;
+    private string readerMail = string.Empty;
+    private string platform = string.Empty;
+
     private async Task HandleSubmit()
     {
         Console.WriteLine("Form submitted");
-        try
+        if (requestService._context.Requests.Any(item => item.Reader.ReaderNumber == readerNumb))
         {
-            var reader = new Reader { Email = "test@mail.com" };
-            var platform = new EbookPlatform { Name = "Test" };
-
-            await requestService.MakeRequest(reader, platform);
-
-            Console.WriteLine("Zgłoszenie wysłane!");
+            Console.WriteLine("Zgłoszenie zignorowane!");
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine($"Błąd: {ex.Message}");
+            try
+            {
+                var reader = new Reader { Email = "test@mail.com" };
+                var platform = new EbookPlatform { Name = "Test" };
+
+                await requestService.MakeRequest(reader, platform);
+
+                Console.WriteLine("Zgłoszenie wysłane!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Błąd: {ex.Message}");
+            }
         }
     }
 }

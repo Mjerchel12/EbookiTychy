@@ -7,11 +7,11 @@ namespace Tychy.Components.Services
     public class MonthlyCheckService:BackgroundService
     {
         private readonly IConfiguration _configuration;
-        private readonly AppDbContext _context;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public MonthlyCheckService(AppDbContext context, IConfiguration configuration) {
+        public MonthlyCheckService(IServiceScopeFactory scopeFactory, IConfiguration configuration) {
             _configuration = configuration;
-            _context = context;
+            _scopeFactory = scopeFactory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -22,7 +22,7 @@ namespace Tychy.Components.Services
                 {
                     // Oblicz czas do następnego pierwszego dnia miesiąca
                     var nextRun = GetNextFirstDayOfMonth();
-                    var delay = nextRun - DateTime.Now;
+                    var delay = nextRun - DateTime.UtcNow;
 
                     if (delay > TimeSpan.Zero)
                     {
@@ -31,7 +31,9 @@ namespace Tychy.Components.Services
 
                     if (!stoppingToken.IsCancellationRequested)
                     {
-                        await ExecuteMonthlyTask();
+                        using var scope = _scopeFactory.CreateScope();
+                        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                        await ExecuteMonthlyTask(context);
                     }
                 }
                 catch (Exception ex)
@@ -42,25 +44,34 @@ namespace Tychy.Components.Services
         }
         private DateTime GetNextFirstDayOfMonth()
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var nextMonth = now.Month == 12 ? new DateTime(now.Year + 1, 1, 1)
                                             : new DateTime(now.Year, now.Month + 1, 1);
             return nextMonth;
         }
 
-        private async Task ExecuteMonthlyTask()
+        private async Task ExecuteMonthlyTask(AppDbContext context)
         {
-            foreach (EbookCode c in _context.Codes)
+            foreach(Reader r in context.Readers)
+            {
+                if (r.HasUnusedCodeLastMonth)
+                {
+                    r.HasUnusedCodeLastMonth = false;
+                    await context.SaveChangesAsync();
+                }
+            }
+            foreach (EbookCode c in context.Codes)
             { 
                 if(c.Deadline != null && c.Deadline <= DateTime.UtcNow)
                 {
                     c.IsValid = false;
-                    c.Reader.IsBlocked = true;
+                    c.Reader.HasUnusedCodeLastMonth = true;
+                    await context.SaveChangesAsync();
                 }
             }
-            foreach (Reader r in _context.Readers)
+            foreach (Reader r in context.Readers)
             {
-                if (!r.IsBlocked)
+                if (!r.IsBlocked && !r.HasUnusedCodeLastMonth)
                 {
                     try
                     {
@@ -80,7 +91,7 @@ namespace Tychy.Components.Services
                         {
                             From = new MailAddress(username),
                             Subject = "Kod ebook",
-                            Body = "Twój kod to: " + r.Requests[0].AssignedCode.Code + ". " + r.Requests[0].Platform.Instructions,
+                            Body = "Twój kod to: " + r.Request.AssignedCode.Code + ". " + r.Request.Platform.Instructions,
                             IsBodyHtml = false
                         };
 
