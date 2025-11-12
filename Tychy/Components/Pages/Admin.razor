@@ -2,6 +2,7 @@
 @using Tychy.Components.Services
 @rendermode InteractiveServer
 @inject PlatformService platformService
+@inject RequestService requestService
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -105,52 +106,53 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>2024-01-15 10:30</td>
-                                    <td>
-                                        <strong>123456</strong><br>
-                                        <small class="text-muted">Jan Kowalski</small>
-                                    </td>
-                                    <td>Legimi</td>
-                                    <td>jan.kowalski@email.com</td>
-                                    <td><span class="badge bg-warning">Oczekujące</span></td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-success" title="Zaakceptuj">
-                                                <i class="bi bi-check-lg"></i>
-                                            </button>
-                                            <button class="btn btn-danger" title="Odrzuć">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                            <button class="btn btn-primary" title="Wyślij kod">
-                                                <i class="bi bi-envelope"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>2024-01-15 09:15</td>
-                                    <td>
-                                        <strong>789012</strong><br>
-                                        <small class="text-muted">Anna Nowak</small>
-                                    </td>
-                                    <td>Empik GO</td>
-                                    <td>anna.nowak@email.com</td>
-                                    <td><span class="badge bg-warning">Oczekujące</span></td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-success" title="Zaakceptuj">
-                                                <i class="bi bi-check-lg"></i>
-                                            </button>
-                                            <button class="btn btn-danger" title="Odrzuć">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                            <button class="btn btn-primary" title="Wyślij kod">
-                                                <i class="bi bi-envelope"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                @if(platformService._context.Requests.Count() != 0)
+                                {
+                                    @foreach (var r in platformService._context.Requests)
+                                    {
+                                        <tr>
+                                            <td>@r.RequestDate</td>
+                                            <td>
+                                                @if (r.Reader != null)
+                                                {
+                                                    <strong>@r.Reader.ReaderNumber</strong>
+
+                                                    <br>
+                                                    <small class="text-muted">@r.Reader.FullName</small>
+                                                }
+                                                else
+                                                {
+                                                    <strong>Brak danych czytelnika</strong>
+
+                                                    <br>
+                                                    <small class="text-muted">Reader jest null</small>
+                                                }
+                                            </td>
+                                            <td>@r.Platform</td>
+                                            <td>@r.Email</td>
+                                            <td><span class="badge bg-warning">@r.Status</span></td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-success" @onclick="() => ApproveRequest(r.Id)" title="Zaakceptuj">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+                                                    <button class="btn btn-danger" @onclick="() => RejectRequest(r.Id)" title="Odrzuć">
+                                                        <i class="bi bi-x-lg"></i>
+                                                    </button>
+                                                    <button class="btn btn-primary" @onclick="() => SendCode(r.Id)" title="Wyślij kod">
+                                                        <i class="bi bi-envelope"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center">Brak zgłoszeń</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -213,19 +215,25 @@
     private string platformName = string.Empty;
     private string platformInstructions = string.Empty;
 
-    private void ApproveRequest(int requestId)
+    private EventCallback ApproveRequest(int requestId)
     {
         Console.WriteLine($"Approving request {requestId}");
+        requestService.Approve(requestId);
+        return new EventCallback();
     }
 
-    private void RejectRequest(int requestId)
+    private EventCallback RejectRequest(int requestId)
     {
         Console.WriteLine($"Rejecting request {requestId}");
+        requestService.Reject(requestId);
+        return new EventCallback();
     }
 
-    private void SendCode(int requestId)
+    private EventCallback SendCode(int requestId)
     {
         Console.WriteLine($"Sending code for request {requestId}");
+        requestService.Send(requestId);
+        return new EventCallback();
     }
     private async void AddPlatform()
     {

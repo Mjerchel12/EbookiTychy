@@ -2,7 +2,7 @@
 {
     public class PlatformService
     {
-        private readonly AppDbContext _context;
+        internal readonly AppDbContext _context;
 
         public PlatformService(AppDbContext context) {
             _context = context;
