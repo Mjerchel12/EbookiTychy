@@ -125,5 +125,13 @@ namespace Tychy.Components.Services
                 Console.WriteLine($"{ex} Błąd podczas wysyłania emaila do: {reader.Email}");
             }
         }
+        public async Task<bool> RemoveCode(int id)
+        {
+            _context.Requests.Remove(_context.Requests.First(item => item.Id == id));
+            _context.Codes.Remove(_context.Requests.First(item => item.Id == id).AssignedCode);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

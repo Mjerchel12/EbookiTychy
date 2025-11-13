@@ -33,7 +33,7 @@
 
                         <div class="mb-4">
                             <label for="platform" class="form-label">Wybierz platformę *</label>
-                            <select class="form-select" id="platform">
+                            <select @bind="platform" class="form-select" id="platform">
                                 <option value="">-- Wybierz platformę ebooków --</option>
                                 <option value="Legimi">Legimi (150 dostępnych kodów)</option>
                                 <option value="Empik GO">Empik GO (200 dostępnych kodów)</option>
@@ -81,10 +81,10 @@
         {
             try
             {
-                var reader = new Reader { Email = "test@mail.com" };
-                var platform = new EbookPlatform { Name = "Test" };
+                var reader = requestService._context.Readers.First(item => item.ReaderNumber == readerNumb);
+                var platformObj = requestService._context.Platforms.First(item => item.Name == platform);
 
-                await requestService.MakeRequest(reader, platform);
+                await requestService.MakeRequest(reader, platformObj);
 
                 Console.WriteLine("Zgłoszenie wysłane!");
             }

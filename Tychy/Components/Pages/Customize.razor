@@ -1,0 +1,157 @@
+﻿@page "/customize"
+@using Tychy.Components.Services
+@rendermode InteractiveServer
+@inject PlatformService platformService
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="bg-light">
+                Platforma
+                <div class="card-header navbar-dark-tychy text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-envelope-plus"></i> Dodaj platformę
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nazwa *</label>
+                            <input type="text" class="form-control" id="nameId"
+                                   placeholder="Wprowadź nazwę nowej platformy"
+                                   @bind="platformName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="instructions" class="form-label">Instrukcje *</label>
+                            <input type="text" class="form-control" id="instructionsId"
+                                   placeholder="Wprowadź instrukcję używania kodu"
+                                   @bind="platformInstructions" />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary btn-lg" @onclick="AddPlatform">
+                                <i class="bi bi-send"></i> Wyślij zgłoszenie
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="bg-light">
+                Kod
+                <div class="card-header navbar-dark-tychy text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-envelope-plus"></i> Dodaj kod
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="code" class="form-label">Kod *</label>
+                            <input type="text" class="form-control" id="codeId"
+                                   placeholder="Wprowadź kod"
+                                   @bind="codeName" />
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary btn-lg" @onclick="AddCode">
+                                <i class="bi bi-send"></i> Wyślij zgłoszenie
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="bg-light">
+                Czytelnik
+                <div class="card-header navbar-dark-tychy text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-envelope-plus"></i> Dodaj czytelnika
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="number" class="form-label">Numer czytelnika *</label>
+                            <input type="text" class="form-control" id="numberId"
+                                   placeholder="Wprowadź numer nowego czytelnika"
+                                   @bind="readerNumb" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Mail *</label>
+                            <input type="text" class="form-control" id="mail"
+                                   placeholder="Wprowadź email czytelnika"
+                                   @bind="mail" />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary btn-lg" @onclick="AddReader">
+                                <i class="bi bi-send"></i> Wyślij zgłoszenie
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    private string platformName = string.Empty;
+    private string platformInstructions = string.Empty;
+
+    private string codeName = string.Empty;
+
+    private byte readerNumb = 0;
+    private string mail = string.Empty;
+
+    private async void AddPlatform()
+    {
+        Console.WriteLine("AddedPlatform");
+        try
+        {
+            await platformService.AddPlatform(platformName, platformInstructions);
+
+            Console.WriteLine("Platforma stworzona!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd: {ex.Message}");
+        }
+    }
+    private async void AddCode()
+    {
+        Console.WriteLine("AddedCode");
+        try
+        {
+            await platformService.AddCode(codeName);
+
+            Console.WriteLine("Kod stworzony!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd: {ex.Message}");
+        }
+    }
+    private async void AddReader()
+    {
+        Console.WriteLine("AddedReader");
+        try
+        {
+            await platformService.AddReader(readerNumb, mail);
+
+            Console.WriteLine("Czytelnik  stworzony!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd: {ex.Message}");
+        }
+    }
+}

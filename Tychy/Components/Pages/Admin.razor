@@ -106,45 +106,61 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr class="blocked-style">
+                                    <td>Nigdy</td>
+                                    <td>
+                                        <strong>123456</strong>
+                                        <br>
+                                        <small class="text-muted">Jan Zablokowany</small>
+                                    </td>
+                                    <td>Legimi GO</td>
+                                    <td>j.merchel21@qmail.com</td>
+                                </tr>
                                 @if(platformService._context.Requests.Count() != 0)
                                 {
                                     @foreach (var r in platformService._context.Requests)
                                     {
-                                        <tr>
-                                            <td>@r.RequestDate</td>
-                                            <td>
-                                                @if (r.Reader != null)
-                                                {
-                                                    <strong>@r.Reader.ReaderNumber</strong>
+                                        @if (r != null)
+                                        {
+                                            <tr class="@(r.Reader==null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth)) ? "" : "blocked-style")">
+                                                <td>@r.RequestDate</td>
+                                                <td>
+                                                    @if (r.Reader != null)
+                                                    {
+                                                        <strong>@r.Reader.ReaderNumber</strong>
 
-                                                    <br>
-                                                    <small class="text-muted">@r.Reader.FullName</small>
-                                                }
-                                                else
-                                                {
-                                                    <strong>Brak danych czytelnika</strong>
+                                                        <br>
+                                                        <small class="text-muted">@r.Reader.FullName</small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <strong>Brak danych czytelnika</strong>
 
-                                                    <br>
-                                                    <small class="text-muted">Reader jest null</small>
+                                                        <br>
+                                                        <small class="text-muted">Reader jest null</small>
+                                                    }
+                                                </td>
+                                                @if (r.Platform != null)
+                                                {
+                                                    <td>@r.Platform.Name</td>
                                                 }
-                                            </td>
-                                            <td>@r.Platform</td>
-                                            <td>@r.Email</td>
-                                            <td><span class="badge bg-warning">@r.Status</span></td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <button class="btn btn-success" @onclick="() => ApproveRequest(r.Id)" title="Zaakceptuj">
-                                                        <i class="bi bi-check-lg"></i>
-                                                    </button>
-                                                    <button class="btn btn-danger" @onclick="() => RejectRequest(r.Id)" title="Odrzuć">
-                                                        <i class="bi bi-x-lg"></i>
-                                                    </button>
-                                                    <button class="btn btn-primary" @onclick="() => SendCode(r.Id)" title="Wyślij kod">
-                                                        <i class="bi bi-envelope"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                <td>@r.Email</td>
+                                                <td><span class="badge bg-warning">@r.Status</span></td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button class="btn btn-success" @onclick="() => ApproveRequest(r.Id)" title="Zaakceptuj">
+                                                            <i class="bi bi-check-lg"></i>
+                                                        </button>
+                                                        <button class="btn btn-danger" @onclick="() => RejectRequest(r.Id)" title="Odrzuć">
+                                                            <i class="bi bi-x-lg"></i>
+                                                        </button>
+                                                        <button class="btn btn-primary" @onclick="() => SendCode(r.Id)" title="Wyślij kod">
+                                                            <i class="bi bi-envelope"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
                                     }
                                 }
                                 else
@@ -155,6 +171,9 @@
                                 }
                             </tbody>
                         </table>
+                        <button class="btn btn-primary" @onclick="SendAll" title="Wyślij wszystkie kody">
+                            <i class="bi bi-envelope">Wyślij wszystkie kody</i>
+                        </button>
                     </div>
 
                     <nav aria-label="Page navigation">
@@ -170,50 +189,9 @@
             </div>
         </div>
     </div>
-    <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="bg-light">
-                    <div class="card-header navbar-dark-tychy text-white">
-                        <h4 class="mb-0">
-                            <i class="bi bi-envelope-plus"></i> Dodaj platformę
-                        </h4>
-                    </div>
-                    <div class="card-body">
-                        <form>
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nazwa *</label>
-                                <input type="text" class="form-control" id="nameId"
-                                       placeholder="Wprowadź nazwę nowej platformy"
-                                       @bind="platformName"/>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="instructions" class="form-label">Instrukcje *</label>
-                                <input type="text" class="form-control" id="instructionsId"
-                                       placeholder="Wprowadź instrukcję używania kodu"
-                                       @bind="platformInstructions"/>
-                            </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary btn-lg" @onclick="AddPlatform">
-                                    <i class="bi bi-send"></i> Wyślij zgłoszenie
-                                </button>
-                                <button type="reset" class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 @code {
-    private string platformName = string.Empty;
-    private string platformInstructions = string.Empty;
 
     private EventCallback ApproveRequest(int requestId)
     {
@@ -233,20 +211,19 @@
     {
         Console.WriteLine($"Sending code for request {requestId}");
         requestService.Send(requestId);
+        requestService.RemoveCode(requestId);
         return new EventCallback();
     }
-    private async void AddPlatform()
-    {
-        Console.WriteLine("AddedPlatform");
-        try
+    private void SendAll()
+    {       
+        foreach (var r in platformService._context.Requests)
         {
-            await platformService.AddPlatform(platformName, platformInstructions);
-
-            Console.WriteLine("Zgłoszenie wysłane!");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Błąd: {ex.Message}");
+            if(r.Status == RequestStatus.Approved)
+            {
+                Console.WriteLine($"Sending code for request {r.Id}");
+                requestService.Send(r.Id);
+                requestService.RemoveCode(r.Id);
+            }
         }
     }
 }
