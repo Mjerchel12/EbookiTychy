@@ -171,7 +171,13 @@
                                 }
                             </tbody>
                         </table>
-                        <button class="btn btn-primary" @onclick="SendAll" title="Wyślij wszystkie kody">
+                        <button class="btn btn-primary" @onclick="SendAll" title="Wyślij wszystkie zaakceptowane kody">
+                            <i class="bi bi-envelope">Wyślij wszystkie kody</i>
+                        </button>
+                        <button class="btn btn-primary" @onclick="AcceptAll" title="Zaakceptuj wszystkie dobre prośby">
+                            <i class="bi bi-envelope">Wyślij wszystkie kody</i>
+                        </button>
+                        <button class="btn btn-primary" @onclick="DeclineAll" title="Odrzuć wszystkie złe kody">
                             <i class="bi bi-envelope">Wyślij wszystkie kody</i>
                         </button>
                     </div>
@@ -223,6 +229,28 @@
                 Console.WriteLine($"Sending code for request {r.Id}");
                 requestService.Send(r.Id);
                 requestService.RemoveCode(r.Id);
+            }
+        }
+    }
+    private void AcceptAll()
+    {
+        foreach (var r in platformService._context.Requests)
+        {
+            if (r.Reader == null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth)))
+            {
+                Console.WriteLine($"Approving request {r.Id}");
+                requestService.Approve(r.Id);
+            }
+        }
+    }
+    private void DeclineAll()
+    {
+        foreach (var r in platformService._context.Requests)
+        {
+            if (!(r.Reader == null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth))))
+            {
+                Console.WriteLine($"Rejecting request {r.Id}");
+                requestService.Reject(r.Id);
             }
         }
     }
