@@ -35,8 +35,8 @@
                             <label for="platform" class="form-label">Wybierz platformę *</label>
                             <select @bind="platform" class="form-select" id="platform">
                                 <option value="">-- Wybierz platformę ebooków --</option>
-                                <option value="Legimi">Legimi (150 dostępnych kodów)</option>
-                                <option value="Empik GO">Empik GO (200 dostępnych kodów)</option>
+                                <option value="Legimi">Legimi</option>
+                                <option value="Empik GO">Empik GO</option>
                                 <option value="Nexto" disabled>Nexto (brak kodów)</option>
                             </select>
                         </div>
@@ -76,6 +76,10 @@
         if (requestService._context.Requests.Any(item => item.Reader.ReaderNumber == readerNumb))
         {
             Console.WriteLine("Zgłoszenie zignorowane!");
+        }
+        else if (requestService._context.Platforms.First(item => item.Name == platform).AvailableCodes == 0)
+        {
+            Console.WriteLine("Nie ma kodów");
         }
         else
         {

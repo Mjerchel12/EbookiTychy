@@ -21,7 +21,12 @@
                                    placeholder="Wprowadź nazwę nowej platformy"
                                    @bind="platformName" />
                         </div>
-
+                        <div class="mb-3">
+                            <label for="limit" class="form-label">Limit kodów *</label>
+                            <input type="number" class="form-control" id="limitId"
+                                   placeholder="Wprowadź limit kodów z platformy"
+                                   @bind="platformLimit" />
+                        </div>
                         <div class="mb-3">
                             <label for="instructions" class="form-label">Instrukcje *</label>
                             <input type="text" class="form-control" id="instructionsId"
@@ -54,6 +59,12 @@
                             <input type="text" class="form-control" id="codeId"
                                    placeholder="Wprowadź kod"
                                    @bind="codeName" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="platform" class="form-label">Platforma *</label>
+                            <input type="number" class="form-control" id="platformId"
+                                   placeholder="Wprowadź ID platformy"
+                                   @bind="platId" />
                         </div>
                         <div class="d-grid gap-2">
                             <button type="button" class="btn btn-primary btn-lg" @onclick="AddCode">
@@ -105,9 +116,11 @@
 </div>
 @code {
     private string platformName = string.Empty;
+    private int platformLimit = 0;
     private string platformInstructions = string.Empty;
 
     private string codeName = string.Empty;
+    private int platId = 0;
 
     private byte readerNumb = 0;
     private string mail = string.Empty;
@@ -117,7 +130,7 @@
         Console.WriteLine("AddedPlatform");
         try
         {
-            await platformService.AddPlatform(platformName, platformInstructions);
+            await platformService.AddPlatform(platformName, platformLimit, platformInstructions);
 
             Console.WriteLine("Platforma stworzona!");
         }
@@ -131,7 +144,7 @@
         Console.WriteLine("AddedCode");
         try
         {
-            await platformService.AddCode(codeName);
+            await platformService.AddCode(codeName, platId);
 
             Console.WriteLine("Kod stworzony!");
         }

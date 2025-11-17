@@ -25,7 +25,6 @@ namespace Tychy.Components.Services
                 Status = RequestStatus.Pending,
                 Email = reader.Email
             });
-
             await _context.SaveChangesAsync();
             return true;
         }

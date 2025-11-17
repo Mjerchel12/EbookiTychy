@@ -1,4 +1,5 @@
 ﻿@page "/admin"
+@using Microsoft.EntityFrameworkCore
 @using Tychy.Components.Services
 @rendermode InteractiveServer
 @inject PlatformService platformService
@@ -26,7 +27,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h4 class="card-title">45</h4>
+                            <h4 class="card-title">@pendingRequests</h4>
                             <p class="card-text">Oczekujących zgłoszeń</p>
                         </div>
                         <div>
@@ -41,7 +42,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h4 class="card-title">127</h4>
+                            <h4 class="card-title">@sentRequests</h4>
                             <p class="card-text">Wysłanych kodów</p>
                         </div>
                         <div>
@@ -56,7 +57,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h4 class="card-title">12</h4>
+                            <h4 class="card-title">@rejectedRequests</h4>
                             <p class="card-text">Odrzuconych</p>
                         </div>
                         <div>
@@ -71,8 +72,8 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h4 class="card-title">584</h4>
-                            <p class="card-text">Łącznie w miesiącu</p>
+                            <h4 class="card-title">@allRequests</h4>
+                            <p class="card-text">Prośby w miesiącu</p>
                         </div>
                         <div>
                             <i class="bi bi-graph-up display-4 opacity-50"></i>
@@ -116,7 +117,7 @@
                                     <td>Legimi GO</td>
                                     <td>j.merchel21@qmail.com</td>
                                 </tr>
-                                @if(platformService._context.Requests.Count() != 0)
+                                @if(hasRequests)
                                 {
                                     @foreach (var r in platformService._context.Requests)
                                     {
@@ -184,11 +185,24 @@
 
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center">
-                            <li class="page-item disabled"><a class="page-link" href="#">Poprzednia</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">Następna</a></li>
+                            <li class="page-item @(!pagedRequests.HasPrevious ? "disabled" : "")">
+                                <a class="page-link" @onclick="() => ChangePage(pagedRequests.CurrentPage - 1)" @onclick:preventDefault>
+                                    Poprzednia
+                                </a>
+                            </li>            
+                            @for (int i = 1; i <= pagedRequests.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == pagedRequests.CurrentPage ? "active" : "")">
+                                    <a class="page-link" @onclick="() => ChangePage(i)" @onclick:preventDefault>
+                                        @i
+                                    </a>
+                                </li>
+                            }           
+                            <li class="page-item @(!pagedRequests.HasNext ? "disabled" : "")">
+                                <a class="page-link" @onclick="() => ChangePage(pagedRequests.CurrentPage + 1)" @onclick:preventDefault>
+                                    Następna
+                                </a>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -198,7 +212,44 @@
 </div>
 
 @code {
+    private PagedResult<CodeRequest> pagedRequests = new();
+    private int pendingRequests;
+    private int sentRequests;
+    private int rejectedRequests;
+    private int allRequests;
+    private bool hasRequests;
 
+    protected override async Task OnInitializedAsync()
+    {
+        hasRequests = await platformService._context.Requests.CountAsync() != 0;
+        pendingRequests = await requestService._context.Requests.CountAsync(item => item.Status == RequestStatus.Pending);
+        sentRequests = await requestService._context.Requests.CountAsync(item => item.Status == RequestStatus.EmailSent);
+        rejectedRequests = await requestService._context.Requests.CountAsync(item => item.Status == RequestStatus.Rejected);
+        allRequests = await requestService._context.Requests.CountAsync();
+        await LoadData();
+    }
+    
+    private async Task LoadData(int page = 1)
+    {
+        var query = platformService._context.Requests.AsQueryable();
+        
+        pagedRequests.TotalCount = await query.CountAsync();
+        pagedRequests.CurrentPage = page;
+        pagedRequests.PageSize = 2;
+        
+        pagedRequests.Items = await query
+            .Skip((page - 1) * pagedRequests.PageSize)
+            .Take(pagedRequests.PageSize)
+            .ToListAsync();
+    }
+    
+    private async Task ChangePage(int page)
+    {
+        if (page >= 1 && page <= pagedRequests.TotalPages)
+        {
+            await LoadData(page);
+        }
+    }
     private EventCallback ApproveRequest(int requestId)
     {
         Console.WriteLine($"Approving request {requestId}");

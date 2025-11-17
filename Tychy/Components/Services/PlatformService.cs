@@ -1,4 +1,6 @@
-﻿namespace Tychy.Components.Services
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Tychy.Components.Services
 {
     public class PlatformService
     {
@@ -8,22 +10,28 @@
             _context = context;
         }
 
-        public async Task<bool> AddPlatform(string platName, string instruct)
+        public async Task<bool> AddPlatform(string platName, int platLim, string instruct)
         {
             _context.Platforms.Add(new EbookPlatform
             {
                 Name = platName,
-                Instructions = instruct
+                MonthlyLimit = platLim,
+                Instructions = instruct,
+                Codes = await _context.Codes
+                    .Include(c => c.Platform)
+                    .Where(item => item.Platform.Name == platName)
+                    .ToListAsync()
             });
 
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<bool> AddCode(string code)
+        public async Task<bool> AddCode(string code, int platId)
         {
             _context.Codes.Add(new EbookCode
             {
-                Code = code
+                Code = code,
+                Platform = _context.Platforms.First(item => item.Id == platId)
             });
 
             await _context.SaveChangesAsync();
