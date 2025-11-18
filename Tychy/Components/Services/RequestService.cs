@@ -1,5 +1,5 @@
-﻿using System.Net.Mail;
-using System.Net;
+﻿using MailKit.Net.Smtp;
+using MimeKit;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 namespace Tychy.Components.Services
@@ -38,7 +38,7 @@ namespace Tychy.Components.Services
             CodeRequest cr = _context.Requests.First(item => item.Id == reqId);
             cr.Status = RequestStatus.Rejected;
         }
-        public void Send(int reqId)
+        public async void Send(int reqId)
         {
             CodeRequest cr = _context.Requests.First(item => item.Id == reqId);
             cr.Status = RequestStatus.EmailSent;
@@ -58,26 +58,27 @@ namespace Tychy.Components.Services
                 {
                     SendEmailToReader(reader);
                 }
-                //await SendEmailToReader(new Reader
-                //{
-                //    Request = new CodeRequest()
-                //    {
-                //        AssignedCode = new EbookCode
-                //        {
-                //            Code = "naleśniki"
-                //        },
-                //        Platform = new EbookPlatform()
-                //        {
-                //            Instructions = "Ugotuj naleśnika"
-                //        }
-                //    },
-                //    Email ="m.jerchel12@gmail.com"
-                //});
+                await SendEmailToReader(new Reader
+                {
+                    Request = new CodeRequest()
+                    {
+                        AssignedCode = new EbookCode
+                        {
+                            Code = "naleśniki"
+                        },
+                        Platform = new EbookPlatform()
+                        {
+                            Instructions = "Ugotuj naleśnika"
+                        }
+                    },
+                    Email = "m.jerchel12@gmail.com"
+                });
 
                 transaction.Commit();
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine($"{ex} Błąd podczas wysyłania emaila");
                 transaction.Rollback();
                 throw;
             }
@@ -99,24 +100,23 @@ namespace Tychy.Components.Services
                 var enableSsl = bool.Parse(_configuration["Email:EnableSsl"] ?? "true");
                 Console.WriteLine("SSL: " + enableSsl);
 
-                using var client = new SmtpClient(smtpServer, port)
-                {
-                    EnableSsl = enableSsl,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(username, password)
-                };
+                using var client = new MailKit.Net.Smtp.SmtpClient();
 
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(username),
-                    Subject = "Kod ebook",
-                    Body = $"Twój kod to: {reader.Request.AssignedCode.Code}. {reader.Request.Platform?.Instructions ?? ""}",
-                    IsBodyHtml = false
-                };
+                await client.ConnectAsync(smtpServer, port, enableSsl ? MailKit.Security.SecureSocketOptions.StartTls : MailKit.Security.SecureSocketOptions.None);
+                await client.AuthenticateAsync(username, password);
 
-                mailMessage.To.Add(reader.Email);
+                var mailMessage = new MimeMessage();
+                mailMessage.From.Add(new MailboxAddress("", username));
+                mailMessage.To.Add(new MailboxAddress("", reader.Email));
+                mailMessage.Subject = "Kod ebook";
 
-                await client.SendMailAsync(mailMessage);
+                var bodyBuilder = new BodyBuilder();
+                bodyBuilder.TextBody = $"Twój kod to: {reader.Request.AssignedCode.Code}. {reader.Request.Platform?.Instructions ?? ""}";
+                mailMessage.Body = bodyBuilder.ToMessageBody();
+
+                await client.SendAsync(mailMessage);
+                await client.DisconnectAsync(true);
+
                 Console.WriteLine($"Mail wysłany do: {reader.Email}");
             }
             catch (Exception ex)
