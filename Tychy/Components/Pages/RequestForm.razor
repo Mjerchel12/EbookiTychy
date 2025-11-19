@@ -3,6 +3,7 @@
 @using Tychy.Components.Services
 @using System.Linq
 @inject RequestService requestService
+@inject PlatformService platformService
 
 <div class="container mt-4">
     <div class="row justify-content-center">
@@ -69,6 +70,13 @@
     private byte readerNumb = 0;
     private string readerMail = string.Empty;
     private string platform = string.Empty;
+
+    private List<EbookPlatform> plats = new List<EbookPlatform>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        plats = await platformService.GetPlatformsAsync();
+    }
 
     private async Task HandleSubmit()
     {

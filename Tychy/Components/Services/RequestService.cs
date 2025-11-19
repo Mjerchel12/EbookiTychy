@@ -14,7 +14,19 @@ namespace Tychy.Components.Services
             _context = context;
             _configuration = configuration;
         }
-
+        public async Task<List<CodeRequest>> GetRequestsAsync()
+        {
+            return await _context.Requests
+            .Include(u => u.Reader)
+            .Include(u => u.Platform)
+            .ToListAsync();
+        }
+        public async Task<List<Reader>> GetReadersAsync()
+        {
+            return await _context.Readers
+            .Include(u => u.Request)
+            .ToListAsync();
+        }
         public async Task<bool> MakeRequest(Reader reader, EbookPlatform platform)
         {
             _context.Requests.Add(new CodeRequest
@@ -40,11 +52,34 @@ namespace Tychy.Components.Services
         }
         public async void Send(int reqId)
         {
+            Console.WriteLine("\n");
+            Console.WriteLine("Weszło do metody");
             CodeRequest cr = _context.Requests.First(item => item.Id == reqId);
+            Console.WriteLine("\n");
+            Console.WriteLine("CR zrobione");
             cr.Status = RequestStatus.EmailSent;
+            Console.WriteLine("\n");
+            Console.WriteLine("Status zmieniony");
             using var transaction = _context.Database.BeginTransaction();
+            Console.WriteLine("\n");
+            Console.WriteLine("Using tranzakcja");
             try
             {
+                Console.WriteLine("\n");
+                Console.WriteLine("Try");
+                Console.WriteLine("\n");
+                Console.WriteLine(_context.Readers.Count());
+                Console.WriteLine("\n");
+                Console.WriteLine(_context.Readers.Include(r => r.Request).Count());
+                Console.WriteLine("\n");
+                Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Count());
+                Console.WriteLine("\n");
+                Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).Count());
+                Console.WriteLine("\n");
+                Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).ThenInclude(req => req.Platform).Count());
+                Console.WriteLine("\n");
+                Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).ThenInclude(req => req.Platform).Where(r => !r.IsBlocked && !r.HasUnusedCodeLastMonth && r.Request != null && r.Request.AssignedCode != null).Count());
+                Console.WriteLine("\n");
                 var readersToNotify = _context.Readers
                     .Include(r => r.Request)
                         .ThenInclude(req => req.AssignedCode)
@@ -53,28 +88,33 @@ namespace Tychy.Components.Services
                     .Where(r => !r.IsBlocked && !r.HasUnusedCodeLastMonth &&
                                 r.Request != null && r.Request.AssignedCode != null)
                     .ToList();
-
+                Console.WriteLine("\n");
+                Console.WriteLine("Var");
                 foreach (var reader in readersToNotify)
                 {
-                    SendEmailToReader(reader);
+                    Console.WriteLine("\n");
+                    Console.WriteLine("foreach");
+                    await SendEmailToReader(reader);
                 }
-                await SendEmailToReader(new Reader
-                {
-                    Request = new CodeRequest()
-                    {
-                        AssignedCode = new EbookCode
-                        {
-                            Code = "naleśniki"
-                        },
-                        Platform = new EbookPlatform()
-                        {
-                            Instructions = "Ugotuj naleśnika"
-                        }
-                    },
-                    Email = "m.jerchel12@gmail.com"
-                });
+                //await SendEmailToReader(new Reader
+                //{
+                //    Request = new CodeRequest()
+                //    {
+                //        AssignedCode = new EbookCode
+                //        {
+                //            Code = "naleśniki"
+                //        },
+                //        Platform = new EbookPlatform()
+                //        {
+                //            Instructions = "Ugotuj naleśnika"
+                //        }
+                //    },
+                //    Email = "m.jerchel12@gmail.com"
+                //});
 
                 transaction.Commit();
+                Console.WriteLine("\n");
+                Console.WriteLine("end");
             }
             catch(Exception ex)
             {

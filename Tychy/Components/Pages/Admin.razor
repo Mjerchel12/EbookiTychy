@@ -227,9 +227,13 @@
     private int rejectedRequests;
     private int allRequests;
     private bool hasRequests;
+    private List<CodeRequest> reqs = new List<CodeRequest>();
+    private List<Reader> reads = new List<Reader>();
 
     protected override async Task OnInitializedAsync()
     {
+        reqs = await requestService.GetRequestsAsync();
+        reads = await requestService.GetReadersAsync();
         hasRequests = await platformService._context.Requests.CountAsync() != 0;
         pendingRequests = await requestService._context.Requests.CountAsync(item => item.Status == RequestStatus.Pending);
         sentRequests = await requestService._context.Requests.CountAsync(item => item.Status == RequestStatus.EmailSent);
@@ -273,12 +277,16 @@
         return new EventCallback();
     }
 
-    private EventCallback SendCode(int requestId)
+    private async Task SendCode(int requestId)
     {
+        Console.WriteLine("\n");
+        Console.WriteLine("\n");
+        Console.WriteLine("\n");
+        Console.WriteLine("\n");
+        Console.WriteLine("\n");
         Console.WriteLine($"Sending code for request {requestId}");
         requestService.Send(requestId);
-        requestService.RemoveCode(requestId);
-        return new EventCallback();
+        await requestService.RemoveCode(requestId);
     }
     private void SendAll()
     {       

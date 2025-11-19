@@ -9,7 +9,12 @@ namespace Tychy.Components.Services
         public PlatformService(AppDbContext context) {
             _context = context;
         }
-
+        public async Task<List<EbookPlatform>> GetPlatformsAsync()
+        {
+            return await _context.Platforms
+            .Include(u => u.Codes)
+            .ToListAsync();
+        }
         public async Task<bool> AddPlatform(string platName, int platLim, string instruct)
         {
             _context.Platforms.Add(new EbookPlatform
@@ -37,11 +42,12 @@ namespace Tychy.Components.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<bool> AddReader(byte numb, string mail)
+        public async Task<bool> AddReader(byte numb, string readName, string mail)
         {
             _context.Readers.Add(new Reader
             {
                 ReaderNumber = numb,
+                FullName = readName,
                 Email = mail
             });
 

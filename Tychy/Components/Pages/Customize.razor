@@ -61,7 +61,7 @@
                                    @bind="codeName" />
                         </div>
                         <div class="mb-3">
-                            <label for="platform" class="form-label">Platforma *</label>
+                            <label for="platform" class="form-label">ID Platformy *</label>
                             <input type="number" class="form-control" id="platformId"
                                    placeholder="Wprowadź ID platformy"
                                    @bind="platId" />
@@ -92,7 +92,12 @@
                                    placeholder="Wprowadź numer nowego czytelnika"
                                    @bind="readerNumb" />
                         </div>
-
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Imię i nazwisko *</label>
+                            <input type="text" class="form-control" id="readName"
+                                   placeholder="Wprowadź imię czytelnika"
+                                   @bind="readName" />
+                        </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Mail *</label>
                             <input type="text" class="form-control" id="mail"
@@ -123,6 +128,7 @@
     private int platId = 0;
 
     private byte readerNumb = 0;
+    private string readName = string.Empty;
     private string mail = string.Empty;
 
     private async void AddPlatform()
@@ -158,7 +164,7 @@
         Console.WriteLine("AddedReader");
         try
         {
-            await platformService.AddReader(readerNumb, mail);
+            await platformService.AddReader(readerNumb, readName, mail);
 
             Console.WriteLine("Czytelnik  stworzony!");
         }
