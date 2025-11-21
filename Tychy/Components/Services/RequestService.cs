@@ -29,13 +29,15 @@ namespace Tychy.Components.Services
         }
         public async Task<bool> MakeRequest(Reader reader, EbookPlatform platform)
         {
+            var randomCode = _context.Codes.First(item => (item.Platform.Name == platform.Name)&&(item.Status == CodeStatus.Available));
             _context.Requests.Add(new CodeRequest
             {
                 Reader = reader,
                 Platform = platform,
                 RequestDate = DateTime.Now,
                 Status = RequestStatus.Pending,
-                Email = reader.Email
+                Email = reader.Email,
+                AssignedCode = randomCode
             });
             await _context.SaveChangesAsync();
             return true;
@@ -50,6 +52,74 @@ namespace Tychy.Components.Services
             CodeRequest cr = _context.Requests.First(item => item.Id == reqId);
             cr.Status = RequestStatus.Rejected;
         }
+        // public async void SendAll()
+        // {
+        //     Console.WriteLine("\n");
+        //     Console.WriteLine("Weszło do metody");
+        //     using var transaction = _context.Database.BeginTransaction();
+        //     Console.WriteLine("\n");
+        //     Console.WriteLine("Using tranzakcja");
+        //     try
+        //     {
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine("Try");
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine(_context.Readers.Count());
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine(_context.Readers.Include(r => r.Request).Count());
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Count());
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).Count());
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).ThenInclude(req => req.Platform).Count());
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).ThenInclude(req => req.Platform).Where(r => !r.IsBlocked && !r.HasUnusedCodeLastMonth && r.Request != null && r.Request.AssignedCode != null).Count());
+        //         Console.WriteLine("\n");
+        //         var readersToNotify = _context.Readers
+        //             .Include(r => r.Request)
+        //                 .ThenInclude(req => req.AssignedCode)
+        //             .Include(r => r.Request)
+        //                 .ThenInclude(req => req.Platform)
+        //             .Where(r => !r.IsBlocked && !r.HasUnusedCodeLastMonth &&
+        //                         r.Request != null && r.Request.AssignedCode != null)
+        //             .ToList();
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine("Var");
+        //         foreach (var reader in readersToNotify)
+        //         {
+        //             reader.Request.Status = RequestStatus.EmailSent;
+        //             Console.WriteLine("\n");
+        //             Console.WriteLine("foreach");
+        //             await SendEmailToReader(reader);
+        //         }
+        //         //await SendEmailToReader(new Reader
+        //         //{
+        //         //    Request = new CodeRequest()
+        //         //    {
+        //         //        AssignedCode = new EbookCode
+        //         //        {
+        //         //            Code = "naleśniki"
+        //         //        },
+        //         //        Platform = new EbookPlatform()
+        //         //        {
+        //         //            Instructions = "Ugotuj naleśnika"
+        //         //        }
+        //         //    },
+        //         //    Email = "m.jerchel12@gmail.com"
+        //         //});
+
+        //         transaction.Commit();
+        //         Console.WriteLine("\n");
+        //         Console.WriteLine("end");
+        //     }
+        //     catch(Exception ex)
+        //     {
+        //         Console.WriteLine($"{ex} Błąd podczas wysyłania emaila");
+        //         transaction.Rollback();
+        //         throw;
+        //     }
+        // }
         public async void Send(int reqId)
         {
             Console.WriteLine("\n");
@@ -66,36 +136,11 @@ namespace Tychy.Components.Services
             try
             {
                 Console.WriteLine("\n");
-                Console.WriteLine("Try");
+                Console.WriteLine("Try");                
                 Console.WriteLine("\n");
-                Console.WriteLine(_context.Readers.Count());
-                Console.WriteLine("\n");
-                Console.WriteLine(_context.Readers.Include(r => r.Request).Count());
-                Console.WriteLine("\n");
-                Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Count());
-                Console.WriteLine("\n");
-                Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).Count());
-                Console.WriteLine("\n");
-                Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).ThenInclude(req => req.Platform).Count());
-                Console.WriteLine("\n");
-                Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).ThenInclude(req => req.Platform).Where(r => !r.IsBlocked && !r.HasUnusedCodeLastMonth && r.Request != null && r.Request.AssignedCode != null).Count());
-                Console.WriteLine("\n");
-                var readersToNotify = _context.Readers
-                    .Include(r => r.Request)
-                        .ThenInclude(req => req.AssignedCode)
-                    .Include(r => r.Request)
-                        .ThenInclude(req => req.Platform)
-                    .Where(r => !r.IsBlocked && !r.HasUnusedCodeLastMonth &&
-                                r.Request != null && r.Request.AssignedCode != null)
-                    .ToList();
-                Console.WriteLine("\n");
-                Console.WriteLine("Var");
-                foreach (var reader in readersToNotify)
-                {
-                    Console.WriteLine("\n");
-                    Console.WriteLine("foreach");
-                    await SendEmailToReader(reader);
-                }
+                Console.WriteLine("send");
+                var reader = cr.Reader;
+                await SendEmailToReader(reader);
                 //await SendEmailToReader(new Reader
                 //{
                 //    Request = new CodeRequest()

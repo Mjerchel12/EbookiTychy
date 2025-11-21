@@ -295,7 +295,7 @@
             if(r.Status == RequestStatus.Approved)
             {
                 Console.WriteLine($"Sending code for request {r.Id}");
-                requestService.Send(r.Id);
+                requestService.SendAll(r.Id);
                 requestService.RemoveCode(r.Id);
             }
         }
