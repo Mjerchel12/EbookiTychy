@@ -19,6 +19,7 @@ namespace Tychy.Components.Services
             return await _context.Requests
             .Include(u => u.Reader)
             .Include(u => u.Platform)
+            .Include(u => u.AssignedCode)
             .ToListAsync();
         }
         public async Task<List<Reader>> GetReadersAsync()
@@ -120,7 +121,7 @@ namespace Tychy.Components.Services
         //         throw;
         //     }
         // }
-        public async void Send(int reqId)
+        public async Task Send(int reqId)
         {
             Console.WriteLine("\n");
             Console.WriteLine("Weszło do metody");

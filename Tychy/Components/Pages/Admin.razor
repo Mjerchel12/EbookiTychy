@@ -285,7 +285,7 @@
         Console.WriteLine("\n");
         Console.WriteLine("\n");
         Console.WriteLine($"Sending code for request {requestId}");
-        requestService.Send(requestId);
+        await requestService.Send(requestId);
         await requestService.RemoveCode(requestId);
     }
     private void SendAll()
@@ -295,7 +295,7 @@
             if(r.Status == RequestStatus.Approved)
             {
                 Console.WriteLine($"Sending code for request {r.Id}");
-                requestService.SendAll(r.Id);
+                requestService.Send(r.Id);
                 requestService.RemoveCode(r.Id);
             }
         }
