@@ -43,6 +43,28 @@ namespace Tychy.Components.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        public void ApproveAll()
+        {
+            foreach (var r in _context.Requests)
+            {
+                if (r.Reader == null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth)))
+                {
+                    Console.WriteLine($"Approving request {r.Id}");
+                    r.Status = RequestStatus.Approved;
+                }
+            }
+        }
+        public void RejectAll()
+        {
+            foreach (var r in _context.Requests)
+            {
+                if (!(r.Reader == null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth))))
+                {
+                    Console.WriteLine($"Rejecting request {r.Id}");
+                    r.Status = RequestStatus.Rejected;
+                }
+            }
+        }
         public void Approve(int reqId)
         {
             CodeRequest cr = _context.Requests.First(item => item.Id == reqId);
@@ -53,74 +75,49 @@ namespace Tychy.Components.Services
             CodeRequest cr = _context.Requests.First(item => item.Id == reqId);
             cr.Status = RequestStatus.Rejected;
         }
-        // public async void SendAll()
-        // {
-        //     Console.WriteLine("\n");
-        //     Console.WriteLine("Weszło do metody");
-        //     using var transaction = _context.Database.BeginTransaction();
-        //     Console.WriteLine("\n");
-        //     Console.WriteLine("Using tranzakcja");
-        //     try
-        //     {
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine("Try");
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine(_context.Readers.Count());
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine(_context.Readers.Include(r => r.Request).Count());
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Count());
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).Count());
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).ThenInclude(req => req.Platform).Count());
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine(_context.Readers.Include(r => r.Request).ThenInclude(req => req.AssignedCode).Include(r => r.Request).ThenInclude(req => req.Platform).Where(r => !r.IsBlocked && !r.HasUnusedCodeLastMonth && r.Request != null && r.Request.AssignedCode != null).Count());
-        //         Console.WriteLine("\n");
-        //         var readersToNotify = _context.Readers
-        //             .Include(r => r.Request)
-        //                 .ThenInclude(req => req.AssignedCode)
-        //             .Include(r => r.Request)
-        //                 .ThenInclude(req => req.Platform)
-        //             .Where(r => !r.IsBlocked && !r.HasUnusedCodeLastMonth &&
-        //                         r.Request != null && r.Request.AssignedCode != null)
-        //             .ToList();
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine("Var");
-        //         foreach (var reader in readersToNotify)
-        //         {
-        //             reader.Request.Status = RequestStatus.EmailSent;
-        //             Console.WriteLine("\n");
-        //             Console.WriteLine("foreach");
-        //             await SendEmailToReader(reader);
-        //         }
-        //         //await SendEmailToReader(new Reader
-        //         //{
-        //         //    Request = new CodeRequest()
-        //         //    {
-        //         //        AssignedCode = new EbookCode
-        //         //        {
-        //         //            Code = "naleśniki"
-        //         //        },
-        //         //        Platform = new EbookPlatform()
-        //         //        {
-        //         //            Instructions = "Ugotuj naleśnika"
-        //         //        }
-        //         //    },
-        //         //    Email = "m.jerchel12@gmail.com"
-        //         //});
+        public async void SendAll()
+        {
+            foreach (var r in _context.Requests)
+            {
+                if (r.Status == RequestStatus.Approved)
+                {
+                    Console.WriteLine($"Sending code for request {r.Id}");
+                    Console.WriteLine("\n");
+                    Console.WriteLine("Weszło do metody");
+                    Console.WriteLine("\n");
+                    Console.WriteLine("CR zrobione");
+                    r.Status = RequestStatus.EmailSent;
+                    Console.WriteLine("\n");
+                    Console.WriteLine("Status zmieniony");
+                    using var transaction = _context.Database.BeginTransaction();
+                    Console.WriteLine("\n");
+                    Console.WriteLine("Using tranzakcja");
+                    try
+                    {
+                        Console.WriteLine("\n");
+                        Console.WriteLine("Try");
+                        Console.WriteLine("\n");
+                        Console.WriteLine("send");
+                        var reader = r.Reader;
+                        await SendEmailToReader(reader);
 
-        //         transaction.Commit();
-        //         Console.WriteLine("\n");
-        //         Console.WriteLine("end");
-        //     }
-        //     catch(Exception ex)
-        //     {
-        //         Console.WriteLine($"{ex} Błąd podczas wysyłania emaila");
-        //         transaction.Rollback();
-        //         throw;
-        //     }
-        // }
+                        transaction.Commit();
+                        Console.WriteLine("\n");
+                        Console.WriteLine("end");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"{ex} Błąd podczas wysyłania emaila");
+                        transaction.Rollback();
+                        throw;
+                    }
+                    _context.Requests.Remove(_context.Requests.First(item => item.Id == r.Id));
+                    _context.Codes.Remove(_context.Requests.First(item => item.Id == r.Id).AssignedCode);
+
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
         public async Task Send(int reqId)
         {
             Console.WriteLine("\n");
@@ -142,21 +139,6 @@ namespace Tychy.Components.Services
                 Console.WriteLine("send");
                 var reader = cr.Reader;
                 await SendEmailToReader(reader);
-                //await SendEmailToReader(new Reader
-                //{
-                //    Request = new CodeRequest()
-                //    {
-                //        AssignedCode = new EbookCode
-                //        {
-                //            Code = "naleśniki"
-                //        },
-                //        Platform = new EbookPlatform()
-                //        {
-                //            Instructions = "Ugotuj naleśnika"
-                //        }
-                //    },
-                //    Email = "m.jerchel12@gmail.com"
-                //});
 
                 transaction.Commit();
                 Console.WriteLine("\n");

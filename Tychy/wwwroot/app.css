@@ -129,3 +129,6 @@ main {
 .blocked-style{
     background-color: red
 }
+.approved-style {
+    background-color: green
+}

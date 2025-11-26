@@ -132,7 +132,7 @@
                                     {
                                         @if (r != null)
                                         {
-                                            <tr class="@(r.Reader==null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth)) ? "" : "blocked-style")">
+                                            <tr class="@(r.Reader == null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth)) ? "" : "blocked-style") @(!(r.Status == RequestStatus.Approved) ? "" : "approved-style")">
                                                 <td>@r.RequestDate</td>
                                                 <td>
                                                     @if (r.Reader != null)
@@ -241,21 +241,21 @@
         allRequests = await requestService._context.Requests.CountAsync();
         await LoadData();
     }
-    
+
     private async Task LoadData(int page = 1)
     {
         var query = platformService._context.Requests.AsQueryable();
-        
+
         pagedRequests.TotalCount = await query.CountAsync();
         pagedRequests.CurrentPage = page;
         pagedRequests.PageSize = 2;
-        
+
         pagedRequests.Items = await query
             .Skip((page - 1) * pagedRequests.PageSize)
             .Take(pagedRequests.PageSize)
             .ToListAsync();
     }
-    
+
     private async Task ChangePage(int page)
     {
         if (page >= 1 && page <= pagedRequests.TotalPages)
@@ -290,7 +290,7 @@
     }
     private void SendAll()
     {       
-        foreach (var r in platformService._context.Requests)
+        foreach (var r in requestService._context.Requests)
         {
             if(r.Status == RequestStatus.Approved)
             {
@@ -302,24 +302,10 @@
     }
     private void AcceptAll()
     {
-        foreach (var r in platformService._context.Requests)
-        {
-            if (r.Reader == null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth)))
-            {
-                Console.WriteLine($"Approving request {r.Id}");
-                requestService.Approve(r.Id);
-            }
-        }
+        requestService.ApproveAll();
     }
     private void DeclineAll()
     {
-        foreach (var r in platformService._context.Requests)
-        {
-            if (!(r.Reader == null || (!(r.Reader.IsBlocked || r.Reader.HasUnusedCodeLastMonth))))
-            {
-                Console.WriteLine($"Rejecting request {r.Id}");
-                requestService.Reject(r.Id);
-            }
-        }
+        requestService.RejectAll();
     }
 }
