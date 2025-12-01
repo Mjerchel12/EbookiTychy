@@ -31,12 +31,23 @@ namespace Tychy.Components.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<bool> AddCode(string code, int platId)
+        public async Task<bool> AddCodeLegimi(string code)
         {
             _context.Codes.Add(new EbookCode
             {
                 Code = code,
-                Platform = _context.Platforms.First(item => item.Id == platId)
+                Platform = _context.Platforms.First(item => item.Name == "Legimi")
+            });
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> AddCodeEmpik(string code)
+        {
+            _context.Codes.Add(new EbookCode
+            {
+                Code = code,
+                Platform = _context.Platforms.First(item => item.Name == "Empik GO")
             });
 
             await _context.SaveChangesAsync();

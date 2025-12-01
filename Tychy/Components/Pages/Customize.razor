@@ -46,29 +46,51 @@
                 </div>
             </div>
             <div class="bg-light">
-                Kod
+                Kod Legimi
                 <div class="card-header navbar-dark-tychy text-white">
                     <h4 class="mb-0">
-                        <i class="bi bi-envelope-plus"></i> Dodaj kod
+                        <i class="bi bi-envelope-plus"></i> Dodaj kod Legimi
                     </h4>
                 </div>
                 <div class="card-body">
                     <form>
                         <div class="mb-3">
                             <label for="code" class="form-label">Kod *</label>
-                            <input type="text" class="form-control" id="codeId"
-                                   placeholder="Wprowadź kod"
-                                   @bind="codeName" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="platform" class="form-label">ID Platformy *</label>
-                            <input type="number" class="form-control" id="platformId"
-                                   placeholder="Wprowadź ID platformy"
-                                   @bind="platId" />
+                            <textarea class="form-control" id="codeId"
+                                      placeholder="Wprowadź kod Legimi"
+                                      rows="5"
+                                      @bind="codeNameLegimi"></textarea>
                         </div>
                         <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-primary btn-lg" @onclick="AddCode">
-                                <i class="bi bi-send"></i> Stwórz nowy kod
+                            <button type="button" class="btn btn-primary btn-lg" @onclick="AddCodeLegimi">
+                                <i class="bi bi-send"></i> Stwórz nowy kod Legimi
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="bg-light">
+                Kod Empik GO
+                <div class="card-header navbar-dark-tychy text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-envelope-plus"></i> Dodaj kod Empik GO
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="code" class="form-label">Kod *</label>
+                            <textarea class="form-control" id="codeId"
+                                      placeholder="Wprowadź kod Empik GO"
+                                      rows="5"
+                                      @bind="codeNameEmpik"></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary btn-lg" @onclick="AddCodeEmpik">
+                                <i class="bi bi-send"></i> Stwórz nowy kod Empik GO
                             </button>
                             <button type="reset" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
@@ -124,8 +146,9 @@
     private int platformLimit = 0;
     private string platformInstructions = string.Empty;
 
-    private string codeName = string.Empty;
-    private int platId = 0;
+    private string codeNameLegimi = string.Empty;
+
+    private string codeNameEmpik = string.Empty;
 
     private byte readerNumb = 0;
     private string readName = string.Empty;
@@ -145,12 +168,26 @@
             Console.WriteLine($"Błąd: {ex.Message}");
         }
     }
-    private async void AddCode()
+    private async void AddCodeEmpik()
     {
         Console.WriteLine("AddedCode");
         try
         {
-            await platformService.AddCode(codeName, platId);
+            await platformService.AddCodeEmpik(codeNameEmpik);
+
+            Console.WriteLine("Kod stworzony!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd: {ex.Message}");
+        }
+    }
+    private async void AddCodeLegimi()
+    {
+        Console.WriteLine("AddedCode");
+        try
+        {
+            await platformService.AddCodeLegimi(codeNameLegimi);
 
             Console.WriteLine("Kod stworzony!");
         }
