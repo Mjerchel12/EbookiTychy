@@ -33,22 +33,42 @@ namespace Tychy.Components.Services
         }
         public async Task<bool> AddCodeLegimi(string code)
         {
-            _context.Codes.Add(new EbookCode
-            {
-                Code = code,
-                Platform = _context.Platforms.First(item => item.Name == "Legimi")
-            });
+            string[] codes = code.Split(',');
+            foreach (string codeStr in codes) {
+                _context.Codes.Add(new EbookCode
+                {
+                    Code = codeStr,
+                    Platform = _context.Platforms.First(item => item.Name == "Legimi")
+                });
+            }
 
             await _context.SaveChangesAsync();
             return true;
         }
         public async Task<bool> AddCodeEmpik(string code)
         {
-            _context.Codes.Add(new EbookCode
+            string[] codes = code.Split(',');
+            foreach (string codeStr in codes)
             {
-                Code = code,
-                Platform = _context.Platforms.First(item => item.Name == "Empik GO")
-            });
+                _context.Codes.Add(new EbookCode
+                {
+                    Code = codeStr,
+                    Platform = _context.Platforms.First(item => item.Name == "Empik GO")
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> AddCodeNotAc(string code)
+        {
+            string[] codes = code.Split(',');
+            foreach (string codeStr in codes)
+            {
+                EbookCode notAct = _context.Codes.First(item => item.Code == codeStr);
+                notAct.IsValid = false;
+                notAct.Reader.HasUnusedCodeLastMonth = true;
+            }
 
             await _context.SaveChangesAsync();
             return true;

@@ -55,15 +55,15 @@
                 <div class="card-body">
                     <form>
                         <div class="mb-3">
-                            <label for="code" class="form-label">Kod *</label>
+                            <label for="code" class="form-label">Kody *</label>
                             <textarea class="form-control" id="codeId"
-                                      placeholder="Wprowadź kod Legimi"
+                                      placeholder="Wprowadź kody Legimi"
                                       rows="5"
                                       @bind="codeNameLegimi"></textarea>
                         </div>
                         <div class="d-grid gap-2">
                             <button type="button" class="btn btn-primary btn-lg" @onclick="AddCodeLegimi">
-                                <i class="bi bi-send"></i> Stwórz nowy kod Legimi
+                                <i class="bi bi-send"></i> Stwórz nowy kody Legimi
                             </button>
                             <button type="reset" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
@@ -76,21 +76,48 @@
                 Kod Empik GO
                 <div class="card-header navbar-dark-tychy text-white">
                     <h4 class="mb-0">
-                        <i class="bi bi-envelope-plus"></i> Dodaj kod Empik GO
+                        <i class="bi bi-envelope-plus"></i> Dodaj kody Empik GO
                     </h4>
                 </div>
                 <div class="card-body">
                     <form>
                         <div class="mb-3">
-                            <label for="code" class="form-label">Kod *</label>
+                            <label for="code" class="form-label">Kody *</label>
                             <textarea class="form-control" id="codeId"
-                                      placeholder="Wprowadź kod Empik GO"
+                                      placeholder="Wprowadź kody Empik GO"
                                       rows="5"
                                       @bind="codeNameEmpik"></textarea>
                         </div>
                         <div class="d-grid gap-2">
                             <button type="button" class="btn btn-primary btn-lg" @onclick="AddCodeEmpik">
-                                <i class="bi bi-send"></i> Stwórz nowy kod Empik GO
+                                <i class="bi bi-send"></i> Stwórz nowy kody Empik GO
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="bg-light">
+                Niewykorzystane kody
+                <div class="card-header navbar-dark-tychy text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-envelope-plus"></i> Dodaj niewykorzystane kody
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="code" class="form-label">Kody *</label>
+                            <textarea class="form-control" id="codeId"
+                                      placeholder="Wprowadź niewykorzystane kody"
+                                      rows="5"
+                                      @bind="unusedCodeName"></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary btn-lg" @onclick="AddCodeUnused">
+                                <i class="bi bi-send"></i> Stwórz nowy kody Empik GO
                             </button>
                             <button type="reset" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-clockwise"></i> Wyczyść formularz
@@ -150,6 +177,8 @@
 
     private string codeNameEmpik = string.Empty;
 
+    private string unusedCodeName = string.Empty;
+
     private byte readerNumb = 0;
     private string readName = string.Empty;
     private string mail = string.Empty;
@@ -188,6 +217,20 @@
         try
         {
             await platformService.AddCodeLegimi(codeNameLegimi);
+
+            Console.WriteLine("Kod stworzony!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd: {ex.Message}");
+        }
+    }
+    private async void AddCodeUnused()
+    {
+        Console.WriteLine("AddedCode");
+        try
+        {
+            await platformService.AddCodeNotAc(unusedCodeName);
 
             Console.WriteLine("Kod stworzony!");
         }
